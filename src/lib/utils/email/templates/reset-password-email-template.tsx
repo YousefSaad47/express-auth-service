@@ -1,0 +1,102 @@
+import { CSSProperties } from "react";
+import {
+  Html,
+  Head,
+  Preview,
+  Body,
+  Container,
+  Text,
+  Button,
+} from "@react-email/components";
+
+interface ResetPasswordEmailProps {
+  to: string;
+  url: string;
+}
+
+export const ResetPasswordEmailTemplate = ({
+  to,
+  url,
+}: ResetPasswordEmailProps) => {
+  return (
+    <Html>
+      <Head />
+      <Preview>Reset your password, {to}</Preview>
+      <Body style={styles.body}>
+        <Container style={styles.container}>
+          <Text style={styles.logo}>🔐 YourApp</Text>
+          <Text style={styles.heading}>Reset Your Password</Text>
+          <Text style={styles.content}>
+            Hi {to}, we received a request to reset your password. Click the
+            button below to set a new one.
+          </Text>
+          <Button style={styles.button} href={url}>
+            Reset Password
+          </Button>
+          <Text style={styles.content}>
+            If you didn’t request this, you can safely ignore this email.
+          </Text>
+          <Text style={styles.signature}>– The YourApp Security Team</Text>
+          <Text style={styles.footer}>
+            © {new Date().getFullYear()} YourApp, Inc. All rights reserved.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+};
+
+const styles: Record<string, CSSProperties> = {
+  body: {
+    backgroundColor: "#f9f9f9",
+    fontFamily: "'Segoe UI', sans-serif",
+    fontSize: "16px",
+    color: "#1a1a1a",
+  },
+  container: {
+    backgroundColor: "#ffffff",
+    padding: "30px",
+    maxWidth: "600px",
+    margin: "0 auto",
+    borderRadius: "8px",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
+  },
+  logo: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    color: "#000000",
+  },
+  heading: {
+    fontSize: "22px",
+    fontWeight: "bold",
+    color: "#000000",
+    marginTop: "20px",
+  },
+  content: {
+    fontSize: "16px",
+    lineHeight: "1.6",
+    marginTop: "12px",
+    color: "#333333",
+  },
+  button: {
+    backgroundColor: "#000000",
+    color: "#ffffff",
+    padding: "12px 24px",
+    borderRadius: "6px",
+    textDecoration: "none",
+    display: "inline-block",
+    marginTop: "24px",
+    fontWeight: "bold",
+  },
+  signature: {
+    fontSize: "14px",
+    color: "#555555",
+    marginTop: "24px",
+  },
+  footer: {
+    fontSize: "12px",
+    color: "#888888",
+    marginTop: "24px",
+    textAlign: "center",
+  },
+};
