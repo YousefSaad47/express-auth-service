@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+model User {
+  id         String    @id @default(uuid())
+  email      String    @unique
+  password   String?
+  verifiedAt DateTime?
+  lastLogin  DateTime?
+  role       Role      @default(user)
+
+  Profile Profile?
+  Account Account?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id        String @id @default(uuid())
+  name      String
+
+  bio       String?
+  avatarUrl String? @db.Text
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AccountType {
+  oauth
+  credentials
+  email
+}
+
+model Account {
+  id       String      @id @default(uuid())
+  type     AccountType
+  provider String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TokenType {
+  otp
+  magic_link
+  password_reset
+  email_verification
+}
+
+model Token {
+  id        String     @id @default(uuid())
+  type      TokenType
+  token     String @unique
+  expiresAt DateTime
+
+  email     String
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, type])
+}
+
+model RevokedToken {
+  jti      String
+  token     String @db.VarChar(500)
+  expiresAt DateTime
+  reason    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([jti, token])
+  @@index([expiresAt])
+}
