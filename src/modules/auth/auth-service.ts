@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@/generated/prisma";
-import { enqueueEmail } from "@/lib/bullmq/queues/email.queue";
+import { enqueueEmail } from "@/lib/bullmq/queues/email-queue";
 import { ErrorCodes } from "@/lib/errors/error-codes";
 import {
   BadRequestError,
@@ -20,9 +20,9 @@ import {
   getSignInAttemptsRedisKey,
   incrementSignInAttempts,
   resetSignInAttempts,
-} from "@/middlewares/signin-attempt-limiter";
+} from "@/middlewares/signin-attempts-limiter";
 
-import { SignInBody, SignUpBody } from "./auth.validation";
+import { SignInBody, SignUpBody } from "./auth-validation";
 
 export class AuthService {
   constructor(private readonly db: PrismaClient) {}
@@ -51,6 +51,8 @@ export class AuthService {
           role: true,
         },
       });
+
+      await this.requestEmailVerification(user.email);
 
       return user;
     } catch (err) {
@@ -114,6 +116,11 @@ export class AuthService {
 
     await resetSignInAttempts(signInAttemptsKey);
 
+    await this.db.user.update({
+      where: { id: user.id },
+      data: { lastLogin: new Date() },
+    });
+
     const safeUser = omit(user, "password");
 
     return safeUser;
@@ -151,6 +158,7 @@ export class AuthService {
 
     await enqueueEmail({
       to: user.email,
+      // not actually url otp code
       url: otp,
       template: "otp",
     });
@@ -227,7 +235,7 @@ export class AuthService {
 
     await enqueueEmail({
       to: user.email,
-      url: `http://localhost:3000/auth/magic-link/verify?token=${token}`,
+      url: `${process.env.CLIENT_URL}/auth/magic-link/verify?token=${token}`,
       template: "magicLink",
     });
   }
@@ -303,7 +311,7 @@ export class AuthService {
 
     await enqueueEmail({
       to: user.email,
-      url: `http://localhost:3000/auth/verify-email?token=${token}`,
+      url: `${process.env.CLIENT_URL}/auth/verify-email?token=${token}`,
       template: "emailVerification",
     });
   }
@@ -388,7 +396,7 @@ export class AuthService {
 
     await enqueueEmail({
       to: user.email,
-      url: `http://localhost:3000/auth/reset-password?token=${token}`,
+      url: `${process.env.CLIENT_URL}/auth/reset-password?token=${token}`,
       template: "resetPassword",
     });
   }

@@ -5,20 +5,20 @@ import { RequestHandler, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import passport from "passport";
 
-import { IController } from "@/interfaces/Icontroller";
+import { IController } from "@/interfaces/controller-interface";
 import { UnauthorizedError } from "@/lib/errors/http-errors";
-import { registerPath } from "@/lib/openapi/registery";
+import { registerPath } from "@/lib/openapi/registry";
 import {
   generateJWT,
   revokeTokenReasons,
   setCookie,
   verifyJWT,
 } from "@/lib/utils/auth";
-import { requireJwt } from "@/middlewares/auth-middleware";
-import { signInAttemptsLimiter } from "@/middlewares/signin-attempt-limiter";
+import { requireAuth } from "@/middlewares/auth-middleware";
+import { signInAttemptsLimiter } from "@/middlewares/signin-attempts-limiter";
 import { validateRequest } from "@/middlewares/validation-middleware";
 
-import { AuthService } from "./auth.service";
+import { AuthService } from "./auth-service";
 import {
   csrfHeaderSchema,
   ForgetPasswordBody,
@@ -49,7 +49,7 @@ import {
   verifyMagicLinkQuerySchema,
   VerifyOTPBody,
   verifyOTPBodySchema,
-} from "./auth.validation";
+} from "./auth-validation";
 
 export class AuthController implements IController {
   router: Router;
@@ -347,7 +347,7 @@ export class AuthController implements IController {
       )
       .patch(
         "/password",
-        requireJwt(),
+        requireAuth(),
         validateRequest({ body: updatePasswordBodySchema }),
         this.updatePassword
       )
@@ -569,11 +569,9 @@ export class AuthController implements IController {
   > = async (req, res) => {
     const { email } = req.body;
 
-    const token = await this.service.requestEmailVerification(email);
+    await this.service.requestEmailVerification(email);
 
-    res
-      .status(StatusCodes.OK)
-      .json({ message: "Email verification sent", token });
+    res.status(StatusCodes.OK).json({ message: "Email verification sent" });
   };
 
   private verifyEmailVerification: RequestHandler<

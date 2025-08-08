@@ -1,7 +1,8 @@
 import chalk from "chalk";
 
 import { PrismaClient, User } from "@/generated/prisma";
-import { enqueueEmail } from "@/lib/bullmq/queues/email.queue";
+import { enqueueEmail } from "@/lib/bullmq/queues/email-queue";
+import { logger } from "@/lib/logger";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -20,7 +21,7 @@ if (isDev) {
 
           const duration = Date.now() - start;
 
-          console.log(
+          logger.info(
             "\n[" +
               chalk.bold.dim(`${model}.${operation}`) +
               "] " +
@@ -46,7 +47,7 @@ db = db.$extends({
 
         await enqueueEmail({
           to: user.email,
-          url: "http://localhost:3000",
+          url: `${process.env.CLIENT_URL}`,
           template: "welcome",
         });
 

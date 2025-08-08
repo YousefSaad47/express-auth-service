@@ -1,28 +1,25 @@
 import { RequestHandler } from "express";
 
-import { StatusCodes } from "http-status-codes";
 import passport from "passport";
 
 import { db } from "@/db";
 import { Role } from "@/generated/prisma";
-import { UnauthorizedError } from "@/lib/errors/http-errors";
+import { ForbiddenError, UnauthorizedError } from "@/lib/errors/http-errors";
 import { verifyJWT } from "@/lib/utils/auth";
 
 export const authorizeRole = (...roles: Role[]): RequestHandler => {
-  return (req, res, next) => {
+  return (req, _res, next) => {
     const user = req.currUser;
 
     if (user && !roles.includes(user.role)) {
-      return res
-        .status(StatusCodes.FORBIDDEN)
-        .json({ message: "Unauthorized" });
+      throw new ForbiddenError();
     }
 
     next();
   };
 };
 
-export const requireJwt = (): RequestHandler[] => {
+export const requireAuth = (): RequestHandler[] => {
   return [
     passport.authenticate("jwt", {
       session: false,

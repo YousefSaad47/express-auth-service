@@ -59,7 +59,7 @@ export type RequestOTPBody = z.infer<typeof requestOTPBodySchema>;
 export const verifyOTPBodySchema = z
   .object({
     email: z.email(),
-    otp: z.string().min(6, "OTP must be 6 characters long"),
+    otp: z.string().length(6, "OTP must be 6 characters long"),
   })
   .openapi("VerifyOTPBodySchema", {
     default: {

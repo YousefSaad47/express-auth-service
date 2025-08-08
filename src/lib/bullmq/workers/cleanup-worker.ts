@@ -7,15 +7,22 @@ import { CLEANUP_QUEUE_NAME } from "@/lib/bullmq/queues/cleanup-queue";
 const BATCH_SIZE = 10;
 
 const deleteExpired = async () => {
-  let deleted: number;
+  let deleted1: number;
+  let deleted2: number;
   do {
-    const result = await db.revokedToken.deleteMany({
-      where: { expiresAt: { lte: new Date() } },
-      limit: BATCH_SIZE,
-    });
+    const [res1, res2] = await Promise.all([
+      db.revokedToken.deleteMany({
+        where: { expiresAt: { lte: new Date() } },
+        limit: BATCH_SIZE,
+      }),
+      db.token.deleteMany({
+        where: { expiresAt: { lte: new Date() } },
+      }),
+    ]);
 
-    deleted = result.count;
-  } while (deleted === BATCH_SIZE);
+    deleted1 = res1.count;
+    deleted2 = res2.count;
+  } while (deleted1 === BATCH_SIZE || deleted2 === BATCH_SIZE);
 };
 
 export const cleanupWorker = new Worker(

@@ -29,6 +29,9 @@ export const xssSanitizerBodyQuery: RequestHandler = (req, res, next) => {
 
   Object.defineProperty(req, "query", {
     value: sanitize(req.query),
+    writable: false,
+    enumerable: true,
+    configurable: false,
   });
 
   next();
