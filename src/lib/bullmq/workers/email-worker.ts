@@ -4,7 +4,7 @@ import { redis } from "@/core/redis";
 import {
   EMAIL_QUEUE_NAME,
   EmailJobData,
-} from "@/lib/bullmq/queues/email.queue";
+} from "@/lib/bullmq/queues/email-queue";
 import { emailTemplates } from "@/lib/utils/email/templates";
 import { sendEmail } from "@/lib/utils/email/transporter";
 

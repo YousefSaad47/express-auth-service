@@ -13,7 +13,7 @@ export const getSignInAttemptsRedisKey = (ip: string | undefined) => {
 export const signInAttemptsLimiter: RequestHandler = async (req, res, next) => {
   const key = getSignInAttemptsRedisKey(req.ip);
 
-  const attempts = parseInt((await redis.get(key)) || "0");
+  const attempts = Number((await redis.get(key)) ?? "0");
 
   if (attempts >= MAX_SIGNIN_ATTEMPTS) {
     const blockTime = await redis.ttl(key);

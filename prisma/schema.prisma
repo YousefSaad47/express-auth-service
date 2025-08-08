@@ -52,7 +52,6 @@ model Profile {
 enum AccountType {
   oauth
   credentials
-  email
 }
 
 model Account {
