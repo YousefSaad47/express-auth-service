@@ -25,7 +25,7 @@ export const validateRequest =
 
       body && (req.body = body as any);
       query && Object.assign(req.query as any, query);
-      params && Object.assign(req.params as any, params);
+      params && (req.params = params as any);
     } catch (err) {
       throw new ValidationError(
         "Validation failed",

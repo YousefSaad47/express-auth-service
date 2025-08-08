@@ -23,9 +23,9 @@ export const csrf: RequestHandler = async (req, res, next) => {
   }
 
   if (
-    req.path.startsWith("/auth") &&
+    req.path.startsWith(`${process.env.API_PREFIX}/auth`) &&
     // and not password update
-    !(req.path === "/auth/password") &&
+    !(req.path === `${process.env.API_PREFIX}/auth/password`) &&
     !(req.method === "PATCH")
   ) {
     return next();
