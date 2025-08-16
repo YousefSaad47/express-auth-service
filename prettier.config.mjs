@@ -27,8 +27,9 @@ const config = {
     "",
     "<TYPES>",
   ],
-  importOrderParserPlugins: ["typescript"],
+  importOrderParserPlugins: ["typescript", "jsx"],
   importOrderTypeScriptVersion: "5.0.0",
+  importOrderCaseSensitive: false,
 };
 
 export default config;
