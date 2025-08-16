@@ -1,12 +1,12 @@
-import { CSSProperties } from "react";
 import {
-  Html,
-  Head,
-  Preview,
   Body,
   Container,
+  Head,
+  Html,
+  Preview,
   Text,
 } from "@react-email/components";
+import { CSSProperties } from "react";
 
 interface OtpEmailProps {
   to: string;
