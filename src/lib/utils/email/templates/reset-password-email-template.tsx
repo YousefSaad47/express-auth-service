@@ -1,13 +1,13 @@
-import { CSSProperties } from "react";
 import {
-  Html,
-  Head,
-  Preview,
   Body,
-  Container,
-  Text,
   Button,
+  Container,
+  Head,
+  Html,
+  Preview,
+  Text,
 } from "@react-email/components";
+import { CSSProperties } from "react";
 
 interface ResetPasswordEmailProps {
   to: string;
