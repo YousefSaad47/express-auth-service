@@ -35,7 +35,7 @@ const isRequestedByFormElementRe =
 export const csrf = (opts: CSRFOptions): RequestHandler => {
   const originHandler: IsAllowedOriginHandler = ((optsOrigin) => {
     if (!optsOrigin) {
-      return (origin, req) => origin === new URL(req.url).origin;
+      return (origin, req) => origin === req.protocol + "://" + req.get("host");
     } else if (typeof optsOrigin === "string") {
       return (origin) => origin === optsOrigin;
     } else if (typeof optsOrigin === "function") {
@@ -83,7 +83,7 @@ export const csrf = (opts: CSRFOptions): RequestHandler => {
     return secFetchSiteHandler(secFetchSite, req);
   };
 
-  return (req, res, next) => {
+  return (req, _res, next) => {
     if (
       !isSafeMethodRe.test(req.method) &&
       isRequestedByFormElementRe.test(
