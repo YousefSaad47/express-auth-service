@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start:prod": "cross-env NODE_ENV=production node -r tsconfig-paths/register .",
-    "build": "rimraf dist && rimraf .tsbuildinfo && tsc && tsc-alias",
+    "build": "rimraf dist && tsc && tsc-alias",
     "type:check": "tsc -w --noEmit",
     "tsx": "tsx watch --clear-screen=false src/index.ts",
     "start:dev": "cross-env NODE_ENV=development run-p type:check tsx",
