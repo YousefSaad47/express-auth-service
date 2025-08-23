@@ -6,8 +6,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "lib": ["es2022"],
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
