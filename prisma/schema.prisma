@@ -36,8 +36,8 @@ model User {
 }
 
 model Profile {
-  id        String @id @default(uuid())
-  name      String
+  id   String @id @default(uuid())
+  name String
 
   bio       String?
   avatarUrl String? @db.Text
@@ -74,13 +74,12 @@ enum TokenType {
 }
 
 model Token {
-  id        String     @id @default(uuid())
+  id        String    @id @default(uuid())
   type      TokenType
-  token     String @unique
+  token     String    @unique
   expiresAt DateTime
 
-  email     String
-
+  email String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,8 +88,8 @@ model Token {
 }
 
 model RevokedToken {
-  jti      String
-  token     String @db.VarChar(500)
+  jti       String
+  token     String   @db.VarChar(500)
   expiresAt DateTime
   reason    String?
 

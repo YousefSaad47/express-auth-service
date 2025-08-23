@@ -1,6 +1,6 @@
 import nodemailer, { SendMailOptions } from "nodemailer";
 
-export const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT),
   secure: process.env.EMAIL_SECURE === "true",

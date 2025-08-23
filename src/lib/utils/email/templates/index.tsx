@@ -1,10 +1,10 @@
 import { render } from "@react-email/components";
 
-import { EmailVerificationTemplate } from "./email-verification-template";
-import { MagicLinkEmailTemplate } from "./magic-link-email-template";
-import { OTPEmailTemplate } from "./otp-email-template";
-import { ResetPasswordEmailTemplate } from "./reset-password-email-template";
-import { WelcomeEmailTemplate } from "./welcome-email-template";
+import { EmailVerificationTemplate } from "./email-verification.template";
+import { MagicLinkEmailTemplate } from "./magic-link-email.template";
+import { OTPEmailTemplate } from "./otp-email.template";
+import { ResetPasswordEmailTemplate } from "./reset-password-email.template";
+import { WelcomeEmailTemplate } from "./welcome-email.template";
 
 const welcomeEmailTemplate = async (to: string, url: string) => {
   const html = await render(<WelcomeEmailTemplate to={to} loginUrl={url} />);

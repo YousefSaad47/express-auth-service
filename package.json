@@ -1,14 +1,14 @@
 {
-  "name": "7",
+  "name": "express-auth-service",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node .",
+    "start:prod": "cross-env NODE_ENV=production node .",
     "build": "tsc",
     "type:check": "tsc -w --noEmit",
-    "dev:run": "tsx watch --clear-screen=false src/index.ts",
-    "dev": "run-p type:check dev:run",
+    "tsx": "tsx watch --clear-screen=false src/index.ts",
+    "start:dev": "cross-env NODE_ENV=development run-p type:check tsx",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
@@ -19,7 +19,9 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/script.ts",
-    "db:reset": "tsx prisma/script.ts --reset"
+    "db:reset": "tsx prisma/script.ts --reset",
+    "prepare": "husky",
+    "knip": "knip"
   },
   "keywords": [],
   "author": "",
@@ -30,8 +32,9 @@
     "@dicebear/core": "^9.2.3",
     "@dicebear/initials": "^9.2.3",
     "@faker-js/faker": "^9.9.0",
-    "@prisma/client": "^6.13.0",
+    "@prisma/client": "6.13.0",
     "@react-email/components": "^0.4.0",
+    "@sentry/node": "^10.5.0",
     "@types/express": "^5.0.3",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.56.9",
@@ -58,6 +61,8 @@
     "zod": "^4.0.15"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.32.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.6.1",
     "@types/compression": "^1.8.1",
@@ -76,8 +81,14 @@
     "@types/react": "^19.1.9",
     "@types/swagger-ui-express": "^4.1.8",
     "commander": "^14.0.0",
+    "cross-env": "^10.0.0",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.32.0",
+    "eslint-plugin-unused-imports": "^4.2.0",
     "globals": "^16.3.0",
+    "husky": "^9.1.7",
+    "knip": "^5.63.0",
+    "lint-staged": "^16.1.5",
     "morgan": "^1.10.1",
     "npm-run-all": "^4.1.5",
     "ora": "^8.2.0",
@@ -86,5 +97,10 @@
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

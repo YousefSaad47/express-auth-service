@@ -5,8 +5,8 @@ import { QueueEvents } from "bullmq";
 import { redis } from "@/core/redis";
 import { logger } from "@/lib/logger";
 
-import { CLEANUP_QUEUE_NAME } from "./queues/cleanup-queue";
-import { EMAIL_QUEUE_NAME } from "./queues/email-queue";
+import { CLEANUP_QUEUE_NAME } from "./queues/cleanup.queue";
+import { EMAIL_QUEUE_NAME } from "./queues/email.queue";
 
 const emailQueueEvents = new QueueEvents(EMAIL_QUEUE_NAME, {
   connection: redis,

@@ -5,8 +5,6 @@ import { z } from "zod";
 
 import { logger } from "@/lib/logger";
 
-const requiredString = z.string().min(1);
-
 const stringValue = z.custom<StringValue>(
   (val) => {
     if (!val) return false;
@@ -17,45 +15,68 @@ const stringValue = z.custom<StringValue>(
   }
 );
 
+const corsOriginsSchema = z
+  .string()
+  .refine((val) => {
+    const origins = val.split(",").map((o) => o.trim());
+    return origins.every((o) => z.url().safeParse(o).success);
+  }, "ALLOWED_ORIGINS must be a comma-separated list of valid URLs, e.g., <url1>,<url2>,<url3>")
+  .transform((val) => val.split(",").map((o) => o.trim()));
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production"]).default("development"),
-  PORT: requiredString,
-  API_PREFIX: requiredString,
-  CLIENT_URL: z.url(),
+  PORT: z.string().min(1).default("3000"),
+  API_PREFIX: z.string().min(1).default("/api/v1"),
+  ALLOWED_ORIGINS: corsOriginsSchema,
 
-  DATABASE_URL: requiredString,
-  REDIS_URL: requiredString,
+  DATABASE_URL: z.string().min(1),
+  REDIS_URL: z.string().min(1),
 
-  JWT_ACCESS_SECRET: requiredString,
-  JWT_REFRESH_SECRET: requiredString,
-  JWT_ACCESS_EXPIRATION: stringValue,
-  JWT_REFRESH_EXPIRATION: stringValue,
-  COOKIE_SECRET: requiredString,
-  OTP_EXPIRATION: stringValue,
-  MAGIC_LINK_EXPIRATION: stringValue,
-  EMAIL_VERIFICATION_EXPIRATION: stringValue,
-  RATE_LIMIT: requiredString,
-  RATE_LIMIT_WINDOW: stringValue,
-  BCRYPT_SALT_ROUNDS: requiredString,
-  MAX_SIGNIN_ATTEMPTS: requiredString,
-  BLOCK_TTL: stringValue,
+  REQUEST_TIMEOUT: stringValue.default("1m"),
 
-  GOOGLE_CLIENT_ID: requiredString,
-  GOOGLE_CLIENT_SECRET: requiredString,
-  GOOGLE_CALLBACK_URL: requiredString,
+  JWT_ACCESS_SECRET: z.string().min(1),
+  JWT_REFRESH_SECRET: z.string().min(1),
+  JWT_ACCESS_EXPIRATION: stringValue.default("15m"),
+  JWT_REFRESH_EXPIRATION: stringValue.default("7d"),
 
-  GITHUB_CLIENT_ID: requiredString,
-  GITHUB_CLIENT_SECRET: requiredString,
-  GITHUB_CALLBACK_URL: requiredString,
+  COOKIE_SECRET: z.string().min(1),
 
-  TURNSTILE_SECRET_KEY: requiredString,
+  OTP_EXPIRATION: stringValue.default("1m"),
+  MAGIC_LINK_EXPIRATION: stringValue.default("1h"),
+  EMAIL_VERIFICATION_EXPIRATION: stringValue.default("1h"),
 
-  EMAIL_HOST: requiredString,
-  EMAIL_PORT: requiredString,
-  EMAIL_SECURE: requiredString,
-  EMAIL_USER: requiredString,
-  EMAIL_PASSWORD: requiredString,
-  EMAIL_FROM: requiredString,
+  BCRYPT_SALT_ROUNDS: z.string().min(1).default("12"),
+
+  RATE_LIMIT: z.string().min(1).default("100"),
+  RATE_LIMIT_WINDOW: stringValue.default("1h"),
+
+  MAX_SIGNIN_ATTEMPTS: z.string().min(1).default("10"),
+  BLOCK_TTL: stringValue.default("15m"),
+
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_CALLBACK_URL: z
+    .string()
+    .min(1)
+    .default("http://localhost:3000/api/v1/auth/google/callback"),
+
+  GITHUB_CLIENT_ID: z.string().min(1),
+  GITHUB_CLIENT_SECRET: z.string().min(1),
+  GITHUB_CALLBACK_URL: z
+    .string()
+    .min(1)
+    .default("http://localhost:3000/api/v1/auth/github/callback"),
+
+  TURNSTILE_SECRET_KEY: z.string().min(1),
+
+  EMAIL_HOST: z.string().min(1),
+  EMAIL_PORT: z.string().min(1),
+  EMAIL_SECURE: z.string().min(1),
+  EMAIL_USER: z.string().min(1),
+  EMAIL_PASSWORD: z.string().min(1),
+  EMAIL_FROM: z.string().min(1),
+
+  SENTRY_DSN: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);
