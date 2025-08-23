@@ -1,4 +1,4 @@
-import { Express, json, urlencoded } from "express";
+import { Application, json, urlencoded } from "express";
 
 import { OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
 import compression from "compression";
@@ -19,7 +19,7 @@ import {
   xssSanitizerBodyQuery,
 } from "@/middlewares";
 
-export const extendExpressApp = (app: Express) => {
+export const extendExpressApp = (app: Application) => {
   app.registerCors = () => {
     app.use(
       cors({

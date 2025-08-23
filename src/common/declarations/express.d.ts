@@ -23,7 +23,7 @@ type PaginatedOpts =
 
 type SuccessOptions = {
   message?: string;
-  status?: number;
+  statusCode?: number;
 };
 
 declare global {
