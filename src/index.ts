@@ -1,52 +1,47 @@
 import "@/core/env";
-import "@/extensions/zod-ext";
+import "@/common/extensions/zod.ext";
 import "@/services/strategies";
 import "@/lib/bullmq";
+import "@/services/sentry/instrument";
 
-import { json, urlencoded } from "express";
+import express from "express";
 
-import compression from "compression";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import helmet from "helmet";
-import hpp from "hpp";
+import * as Sentry from "@sentry/node";
 import morgan from "morgan";
+import ms from "ms";
 
-import { Server } from "@/core/server";
+import { extendExpressApp } from "@/common/extensions";
+import { responseExtension } from "@/common/extensions/response.ext";
 import { db } from "@/db";
-import { csrf } from "@/middlewares/csrf-middleware";
-import { rateLimiter } from "@/middlewares/rate-limiter";
-import { xssSanitizerBodyQuery } from "@/middlewares/xss-sanitizer";
-import { AuthController } from "@/modules/auth/auth-controller";
-import { AuthService } from "@/modules/auth/auth-service";
+import { requestId, timeout } from "@/middlewares";
+import { AuthController, AuthService } from "@/modules/auth";
 
-const server = new Server();
+const app = express();
 
-const mws = [
-  helmet(),
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  }),
-  json({ limit: "10mb" }),
-  urlencoded({ extended: true, limit: "10mb" }),
-  cookieParser(process.env.COOKIE_SECRET),
-  compression(),
-  rateLimiter,
-  xssSanitizerBodyQuery,
-  hpp({ whitelist: [] }),
-];
+Sentry.setupExpressErrorHandler(app);
 
-if (process.env.NODE_ENV === "development") {
-  mws.push(morgan("dev"));
-}
+extendExpressApp(app);
+
+app.use(responseExtension);
 
 const controllers = [new AuthController("/auth", new AuthService(db))];
 
-server
-  .registerMiddlewares(mws)
-  .registerCSRFHandler()
-  .use(csrf)
+app.use(requestId());
+app.set("etag", true);
+app.use(timeout(ms(process.env.REQUEST_TIMEOUT)));
+
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+app
+  .registerSecurity()
+  .registerCors()
+  .registerParsers()
+  .registerCompression()
+  .registerThrottler()
+  .registerSanitizers()
+  .registerCSRF()
   .registerControllers(controllers)
   .registerSwagger()
   .registerErrorHandlers()

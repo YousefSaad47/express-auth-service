@@ -4,17 +4,13 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
 export const registry = new OpenAPIRegistry();
 
-export const bearerAuth = registry.registerComponent(
-  "securitySchemes",
-  "bearerAuth",
-  {
-    type: "http",
-    scheme: "bearer",
-    bearerFormat: "JWT",
-  }
-);
+const bearerAuth = registry.registerComponent("securitySchemes", "bearerAuth", {
+  type: "http",
+  scheme: "bearer",
+  bearerFormat: "JWT",
+});
 
-export const googleOAuth = registry.registerComponent(
+const googleOAuth = registry.registerComponent(
   "securitySchemes",
   "GoogleOAuth",
   {
@@ -32,7 +28,7 @@ export const googleOAuth = registry.registerComponent(
   }
 );
 
-export const githubOAuth = registry.registerComponent(
+const githubOAuth = registry.registerComponent(
   "securitySchemes",
   "GitHubOAuth",
   {

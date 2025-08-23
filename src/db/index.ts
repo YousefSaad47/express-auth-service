@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import { PrismaClient, User } from "@/generated/prisma";
-import { enqueueEmail } from "@/lib/bullmq/queues/email-queue";
+import { enqueueEmail } from "@/lib/bullmq/queues/email.queue";
 import { logger } from "@/lib/logger";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -58,3 +58,13 @@ db = db.$extends({
 }) as PrismaClient;
 
 export { db };
+
+export const connectDB = async () => {
+  try {
+    await db.$connect();
+    logger.info("Database connection established successfully.");
+  } catch (err) {
+    logger.error("Failed to connect to the database:", err);
+    process.exit(1);
+  }
+};
