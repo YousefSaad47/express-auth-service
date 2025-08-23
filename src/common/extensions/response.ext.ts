@@ -11,6 +11,7 @@ export const responseExtension: RequestHandler = (req, res, next) => {
   res.ok = (data: unknown, { message = "Request successful" } = {}) => {
     res.status(HttpStatus.OK).json({
       status: "success",
+      status_code: HttpStatus.OK,
       message,
       data,
       meta: responseMeta(req),
@@ -23,6 +24,7 @@ export const responseExtension: RequestHandler = (req, res, next) => {
   ) => {
     res.status(HttpStatus.CREATED).json({
       status: "success",
+      status_code: HttpStatus.CREATED,
       message,
       data,
       meta: responseMeta(req),
@@ -58,6 +60,7 @@ export const responseExtension: RequestHandler = (req, res, next) => {
 
     res.status(HttpStatus.OK).json({
       status: "success",
+      status_code: HttpStatus.OK,
       message,
       data: {
         items: data,
@@ -69,10 +72,11 @@ export const responseExtension: RequestHandler = (req, res, next) => {
 
   res.success = (
     data: unknown,
-    { message = "Request successful", status = HttpStatus.OK } = {}
+    { message = "Request successful", statusCode = HttpStatus.OK } = {}
   ) => {
-    res.status(status).json({
+    res.status(statusCode).json({
       status: "success",
+      status_code: statusCode,
       message,
       data,
       meta: responseMeta(req),
