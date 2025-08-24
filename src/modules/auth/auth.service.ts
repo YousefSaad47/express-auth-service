@@ -4,6 +4,7 @@ import {
   ConflictException,
   NotFoundException,
 } from "@/common/exceptions";
+import { ALLOWED_ORIGINS } from "@/core/env";
 import { Prisma, PrismaClient, TokenType } from "@/generated/prisma";
 import { enqueueEmail } from "@/lib/bullmq/queues/email.queue";
 import {
@@ -145,7 +146,7 @@ export class AuthService {
     });
 
     await enqueueEmail({
-      to: user.email,
+      to: email,
       // not actually url otp code
       url: otp,
       template: "otp",
@@ -214,8 +215,8 @@ export class AuthService {
     });
 
     await enqueueEmail({
-      to: user.email,
-      url: `${process.env.CLIENT_URL}/auth/magic-link/verify?token=${token}`,
+      to: email,
+      url: `${ALLOWED_ORIGINS[0]}/auth/magic-link/verify?token=${token}`,
       template: "magicLink",
     });
   }
@@ -282,8 +283,8 @@ export class AuthService {
     });
 
     await enqueueEmail({
-      to: user.email,
-      url: `${process.env.CLIENT_URL}/auth/verify-email?token=${token}`,
+      to: email,
+      url: `${ALLOWED_ORIGINS[0]}/auth/verify-email?token=${token}`,
       template: "emailVerification",
     });
   }
@@ -363,8 +364,8 @@ export class AuthService {
     });
 
     await enqueueEmail({
-      to: user.email,
-      url: `${process.env.CLIENT_URL}/auth/reset-password?token=${token}`,
+      to: email,
+      url: `${ALLOWED_ORIGINS[0]}/auth/reset-password?token=${token}`,
       template: "resetPassword",
     });
   }

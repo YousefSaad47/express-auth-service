@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import chalk from "chalk";
 
+import { ALLOWED_ORIGINS } from "@/core/env";
 import { PrismaClient, User } from "@/generated/prisma";
 import { enqueueEmail } from "@/lib/bullmq/queues/email.queue";
 import { logger } from "@/lib/logger";
@@ -47,7 +50,7 @@ db = db.$extends({
 
         await enqueueEmail({
           to: user.email,
-          url: `${process.env.CLIENT_URL}`,
+          url: `${ALLOWED_ORIGINS[0]}/welcome`,
           template: "welcome",
         });
 

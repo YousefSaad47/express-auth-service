@@ -14,7 +14,6 @@ else
   echo ".env already exists, skipping..."
 fi
 
-
 echo "✅ Setup complete!"
 
 docker logs -f app_server

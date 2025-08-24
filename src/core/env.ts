@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import "dotenv/config";
 
 import ms, { StringValue } from "ms";
@@ -100,6 +102,8 @@ const envVars =
 logger.info(
   `Loaded environment variables: ${JSON.stringify(envVars, null, 2)}`
 );
+
+export const ALLOWED_ORIGINS = parsed.data.ALLOWED_ORIGINS;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

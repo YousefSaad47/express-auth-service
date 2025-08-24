@@ -9,7 +9,6 @@ pnpm i
 echo "🔧 Setting up Husky hooks..."
 pnpm prepare
 
-
 echo "🐳 Starting Docker containers..."
 docker compose -f docker-compose.dev.yml up -d postgres pgadmin redis
 
@@ -22,9 +21,9 @@ else
 fi
 
 if [ -d src/generated ]; then
-  echo "src/generated already exists, skipping db:generate..."
+  echo "skipping db:migrate:dev..."
 else
-  pnpm db:generate
+  pnpm db:migrate:dev
 fi
 
 echo "✅ Setup complete!"
