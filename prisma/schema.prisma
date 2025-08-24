@@ -30,6 +30,7 @@ model User {
 
   Profile Profile?
   Account Account?
+  Token   Token[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,12 +80,13 @@ model Token {
   token     String    @unique
   expiresAt DateTime
 
-  email String
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([email, type])
+  @@unique([userId, type])
 }
 
 model RevokedToken {

@@ -4,7 +4,7 @@ import {
   ConflictException,
   NotFoundException,
 } from "@/common/exceptions";
-import { Prisma, PrismaClient } from "@/generated/prisma";
+import { Prisma, PrismaClient, TokenType } from "@/generated/prisma";
 import { enqueueEmail } from "@/lib/bullmq/queues/email.queue";
 import {
   generateInitialsAvatar,
@@ -128,7 +128,7 @@ export class AuthService {
 
   async requestOTP(email: string) {
     const user = await this.findUserByEmail(email, {
-      select: { id: true, email: true },
+      select: { id: true },
     });
 
     if (!user) {
@@ -137,23 +137,11 @@ export class AuthService {
 
     const { otp, otpHash, expiresAt } = await generateOTP();
 
-    await this.db.token.upsert({
-      where: {
-        email_type: {
-          email,
-          type: "otp",
-        },
-      },
-      create: {
-        email,
-        type: "otp",
-        token: otpHash,
-        expiresAt: new Date(expiresAt),
-      },
-      update: {
-        token: otpHash,
-        expiresAt: new Date(expiresAt),
-      },
+    await this.upsertToken({
+      type: "otp",
+      token: otpHash,
+      userId: user.id,
+      expiresAt,
     });
 
     await enqueueEmail({
@@ -165,10 +153,18 @@ export class AuthService {
   }
 
   async verifyOTP(email: string, otp: string) {
+    const user = await this.findUserByEmail(email, {
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException("No user found with this email");
+    }
+
     const otpToken = await this.db.token.findUnique({
       where: {
-        email_type: {
-          email,
+        userId_type: {
+          userId: user.id,
           type: "otp",
         },
       },
@@ -201,7 +197,7 @@ export class AuthService {
 
   async requestMagicLink(email: string) {
     const user = await this.findUserByEmail(email, {
-      select: { id: true, email: true },
+      select: { id: true },
     });
 
     if (!user) {
@@ -210,23 +206,11 @@ export class AuthService {
 
     const { token, tokenHash, expiresAt } = await generateToken();
 
-    await this.db.token.upsert({
-      where: {
-        email_type: {
-          email,
-          type: "magic_link",
-        },
-      },
-      create: {
-        email,
-        type: "magic_link",
-        token: tokenHash,
-        expiresAt: new Date(expiresAt),
-      },
-      update: {
-        token: tokenHash,
-        expiresAt: new Date(expiresAt),
-      },
+    await this.upsertToken({
+      type: "magic_link",
+      token: tokenHash,
+      userId: user.id,
+      expiresAt,
     });
 
     await enqueueEmail({
@@ -237,10 +221,18 @@ export class AuthService {
   }
 
   async verifyMagicLink(email: string, token: string) {
+    const user = await this.findUserByEmail(email, {
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException("No user found with this email");
+    }
+
     const magicLinkToken = await this.db.token.findUnique({
       where: {
-        email_type: {
-          email,
+        userId_type: {
+          userId: user.id,
           type: "magic_link",
         },
       },
@@ -273,7 +265,7 @@ export class AuthService {
 
   async requestEmailVerification(email: string) {
     const user = await this.findUserByEmail(email, {
-      select: { id: true, email: true },
+      select: { id: true },
     });
 
     if (!user) {
@@ -282,23 +274,11 @@ export class AuthService {
 
     const { token, tokenHash, expiresAt } = await generateToken();
 
-    await this.db.token.upsert({
-      where: {
-        email_type: {
-          email,
-          type: "email_verification",
-        },
-      },
-      create: {
-        email,
-        type: "email_verification",
-        token: tokenHash,
-        expiresAt: new Date(expiresAt),
-      },
-      update: {
-        token: tokenHash,
-        expiresAt: new Date(expiresAt),
-      },
+    await this.upsertToken({
+      type: "email_verification",
+      token: tokenHash,
+      userId: user.id,
+      expiresAt,
     });
 
     await enqueueEmail({
@@ -310,10 +290,22 @@ export class AuthService {
 
   async verifyEmailVerification(email: string, token: string) {
     await this.db.$transaction(async (tx) => {
+      const user = await this.findUserByEmail(email, {
+        select: { id: true, verifiedAt: true },
+      });
+
+      if (!user) {
+        throw new NotFoundException("No user found with this email");
+      }
+
+      if (user.verifiedAt) {
+        throw new BadRequestException("Email is already verified");
+      }
+
       const emailVerificationToken = await tx.token.findUnique({
         where: {
-          email_type: {
-            email,
+          userId_type: {
+            userId: user.id,
             type: "email_verification",
           },
         },
@@ -363,23 +355,11 @@ export class AuthService {
 
     const { token, tokenHash, expiresAt } = await generateToken();
 
-    await this.db.token.upsert({
-      where: {
-        email_type: {
-          email,
-          type: "password_reset",
-        },
-      },
-      create: {
-        email,
-        type: "password_reset",
-        token: tokenHash,
-        expiresAt: new Date(expiresAt),
-      },
-      update: {
-        token: tokenHash,
-        expiresAt: new Date(expiresAt),
-      },
+    await this.upsertToken({
+      type: "password_reset",
+      token: tokenHash,
+      userId: user.id,
+      expiresAt,
     });
 
     await enqueueEmail({
@@ -391,10 +371,18 @@ export class AuthService {
 
   async resetPassword(email: string, token: string, newPassword: string) {
     await this.db.$transaction(async (tx) => {
+      const user = await this.findUserByEmail(email, {
+        select: { id: true },
+      });
+
+      if (!user) {
+        throw new NotFoundException("No user found with this email");
+      }
+
       const passwordResetToken = await tx.token.findUnique({
         where: {
-          email_type: {
-            email,
+          userId_type: {
+            userId: user.id,
             type: "password_reset",
           },
         },
@@ -524,5 +512,36 @@ export class AuthService {
       where: { jti_token: { jti, token } },
     });
     return !!revokedToken;
+  }
+
+  async upsertToken({
+    type,
+    userId,
+    token,
+    expiresAt,
+  }: {
+    type: TokenType;
+    userId: string;
+    token: string;
+    expiresAt: Date;
+  }) {
+    await this.db.token.upsert({
+      where: {
+        userId_type: {
+          userId: userId,
+          type,
+        },
+      },
+      create: {
+        userId: userId,
+        type,
+        token,
+        expiresAt: expiresAt,
+      },
+      update: {
+        token,
+        expiresAt: expiresAt,
+      },
+    });
   }
 }

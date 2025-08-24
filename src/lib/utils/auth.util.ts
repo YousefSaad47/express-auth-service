@@ -72,7 +72,7 @@ export const revokeTokenReasons = {
 export const generateOTP = async () => {
   const otp = randomInt(100000, 999999).toString();
 
-  const expiresAt = Date.now() + ms(process.env.OTP_EXPIRATION);
+  const expiresAt = new Date(Date.now() + ms(process.env.OTP_EXPIRATION));
 
   const otpHash = await bcrypt.hash(
     otp,
