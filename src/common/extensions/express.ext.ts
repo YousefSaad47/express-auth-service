@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Application, json, urlencoded } from "express";
 
 import { OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
@@ -10,6 +12,7 @@ import swaggerUi from "swagger-ui-express";
 
 import { ForbiddenException } from "@/common/exceptions";
 import { IController } from "@/common/interfaces";
+import { ALLOWED_ORIGINS } from "@/core/env";
 import { connectDB } from "@/db";
 import { registry } from "@/lib/openapi/registry";
 import {
@@ -25,7 +28,7 @@ export const extendExpressApp = (app: Application) => {
       cors({
         origin: (origin, cb) => {
           if (!origin) return cb(null, true); // allow non-browser requests like postman, curl, etc.
-          if (process.env.ALLOWED_ORIGINS.includes(origin)) {
+          if (ALLOWED_ORIGINS.includes(origin)) {
             return cb(null, true);
           }
 
@@ -122,7 +125,7 @@ export const extendExpressApp = (app: Application) => {
 
           if (
             secFetchSite === "cross-site" &&
-            process.env.ALLOWED_ORIGINS.includes(req.headers.origin!)
+            ALLOWED_ORIGINS.includes(req.headers.origin!)
           ) {
             return true;
           }
