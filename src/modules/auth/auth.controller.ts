@@ -3,9 +3,9 @@
 
 import { RequestHandler, Router } from "express";
 
-import { StatusCodes } from "http-status-codes";
 import passport from "passport";
 
+import { HttpStatus } from "@/common/enums";
 import { UnauthorizedException } from "@/common/exceptions";
 import { IController } from "@/common/interfaces";
 import { registerPath } from "@/lib/openapi/registry";
@@ -77,7 +77,7 @@ export class AuthController implements IController {
       path: `${openApiPathPrefix}/google`,
       summary: "Redirects to Google OAuth",
       authType: "GoogleOAuth",
-      statusCode: StatusCodes.MOVED_TEMPORARILY,
+      statusCode: HttpStatus.FOUND,
       responseDescription: "Redirects to Google OAuth",
     });
 
@@ -88,7 +88,7 @@ export class AuthController implements IController {
       path: `${openApiPathPrefix}/google/callback`,
       summary: "Handles Google OAuth callback and signs in user",
       authType: "GoogleOAuth",
-      statusCode: StatusCodes.NO_CONTENT,
+      statusCode: HttpStatus.NO_CONTENT,
       responseDescription: "Successfully authenticated via Google OAuth",
     });
 
@@ -99,7 +99,7 @@ export class AuthController implements IController {
       path: `${openApiPathPrefix}/github`,
       summary: "Redirects to GitHub OAuth",
       authType: "GitHubOAuth",
-      statusCode: StatusCodes.MOVED_TEMPORARILY,
+      statusCode: HttpStatus.FOUND,
       responseDescription: "Redirects to GitHub OAuth",
     });
 
@@ -110,7 +110,7 @@ export class AuthController implements IController {
       path: `${openApiPathPrefix}/github/callback`,
       summary: "Handles GitHub OAuth callback and signs in user",
       authType: "GitHubOAuth",
-      statusCode: StatusCodes.NO_CONTENT,
+      statusCode: HttpStatus.NO_CONTENT,
       responseDescription: "Successfully authenticated via GitHub OAuth",
     });
 
@@ -122,7 +122,7 @@ export class AuthController implements IController {
       summary: "Registers a new user",
       bodySchema: signUpBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.CREATED,
+      statusCode: HttpStatus.CREATED,
       responseDescription: "User successfully registered",
     });
 
@@ -134,7 +134,7 @@ export class AuthController implements IController {
       summary: "Signs in a user with credentials",
       bodySchema: signInBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.NO_CONTENT,
+      statusCode: HttpStatus.NO_CONTENT,
       responseDescription: "User successfully signed in",
     });
 
@@ -145,7 +145,7 @@ export class AuthController implements IController {
       path: `${openApiPathPrefix}/signout`,
       summary: "Signs out a user",
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.NO_CONTENT,
+      statusCode: HttpStatus.NO_CONTENT,
       responseDescription: "User successfully signed out",
     });
 
@@ -157,7 +157,7 @@ export class AuthController implements IController {
       summary: "Requests an OTP for authentication",
       bodySchema: requestOTPBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "OTP sent to the user",
     });
 
@@ -169,7 +169,7 @@ export class AuthController implements IController {
       summary: "Verifies an OTP for authentication",
       bodySchema: verifyOTPBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "OTP verified successfully",
     });
 
@@ -181,7 +181,7 @@ export class AuthController implements IController {
       summary: "Requests a magic link for authentication",
       bodySchema: requestMagicLinkBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "Magic link sent to the user",
     });
 
@@ -194,7 +194,7 @@ export class AuthController implements IController {
       bodySchema: verifyMagicLinkBodySchema,
       querySchema: verifyMagicLinkQuerySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "Magic link verified successfully",
     });
 
@@ -206,7 +206,7 @@ export class AuthController implements IController {
       summary: "Requests an email verification token",
       bodySchema: requestEmailVerificationBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "Email verification token sent",
     });
 
@@ -219,7 +219,7 @@ export class AuthController implements IController {
       bodySchema: verifyEmailVerificationBodySchema,
       querySchema: verifyEmailVerificationQuerySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "Email verified successfully",
     });
 
@@ -231,7 +231,7 @@ export class AuthController implements IController {
       summary: "Requests a password reset link",
       bodySchema: forgetPasswordBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "Password reset link sent",
     });
 
@@ -244,7 +244,7 @@ export class AuthController implements IController {
       bodySchema: resetPasswordBodySchema,
       querySchema: resetPasswordQuerySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.OK,
+      statusCode: HttpStatus.OK,
       responseDescription: "Password reset successfully",
     });
 
@@ -257,7 +257,7 @@ export class AuthController implements IController {
       authType: "bearerAuth",
       bodySchema: updatePasswordBodySchema,
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.NO_CONTENT,
+      statusCode: HttpStatus.NO_CONTENT,
       responseDescription: "Password updated successfully",
     });
 
@@ -268,7 +268,7 @@ export class AuthController implements IController {
       path: `${openApiPathPrefix}/refresh`,
       summary: "Refreshes a user's access token",
       headersSchema: csrfHeaderSchema,
-      statusCode: StatusCodes.NO_CONTENT,
+      statusCode: HttpStatus.NO_CONTENT,
       responseDescription: "Access token refreshed successfully",
     });
   }
@@ -587,7 +587,7 @@ export class AuthController implements IController {
     await this.service.verifyEmailVerification(email, token);
 
     res
-      .status(StatusCodes.OK)
+      .status(HttpStatus.OK)
       .json({ message: "Email verification successful" });
   };
 
