@@ -45,7 +45,7 @@ export abstract class ErrorHandler {
         error: {
           ...httpError.toJSON().error,
           ...(process.env.NODE_ENV === "development" && {
-            ...(httpError.isFatal && { stack: err.stack }),
+            stack: err.stack,
           }),
         },
         meta: httpError.toJSON(req.id).meta,
